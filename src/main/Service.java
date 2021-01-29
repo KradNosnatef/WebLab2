@@ -48,7 +48,8 @@ public class Service {
         importer.startImport();
         for(;;){
             String[] optionArray = {    "return to last menu", 
-                                        "start guess"};
+                                        "start word guess",
+                                        "start sentence guess"};
             menuPrinter("Main Manu", optionArray);
     
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -60,7 +61,11 @@ public class Service {
                     return;
                 }
                 case '1':{
-                    gotoGuess(importer.knowledgeLib);
+                    gotoWordGuess(importer.knowledgeLib);
+                    break;
+                }
+                case '2':{
+                    gotoSentenceGuess(importer.knowledgeLib);
                     break;
                 }
                 default:{
@@ -71,7 +76,7 @@ public class Service {
         }
     }
 
-    private void gotoGuess(KnowledgeLib knowledgeLib) throws IOException {
+    private void gotoWordGuess(KnowledgeLib knowledgeLib) throws IOException {
         System.out.println("input left word:");
         BufferedReader bufferedReader1= new BufferedReader(new InputStreamReader(System.in));
         String wordL=bufferedReader1.readLine();
@@ -81,5 +86,14 @@ public class Service {
 
         String result=WordKit.toRelationShipWord(knowledgeLib.guess(wordL, wordR));
         System.out.println("i guess type is "+result);
+    }
+
+    private void gotoSentenceGuess(KnowledgeLib knowledgeLib) throws IOException {
+        System.out.println("input sentence");
+        BufferedReader bufferedReader= new BufferedReader(new InputStreamReader(System.in));
+        String sentence=bufferedReader.readLine();
+
+        String result=WordKit.toRelationShipWord(knowledgeLib.guess(sentence));
+        System.out.println("i guess Relationship type is "+result+" between "+WordKit.wordL+","+WordKit.wordR);
     }
 }

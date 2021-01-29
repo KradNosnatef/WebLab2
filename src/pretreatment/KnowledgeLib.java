@@ -52,8 +52,7 @@ public class KnowledgeLib {//用数组存储实体，用链式结构来存储关
         //返回相似度
         public double gvtSimilarity(Entity dstEntity){
             double result=gvtSimilarRelationshipPairs(dstEntity).indexes1.size();
-            result=result/(double)(this.relationships.size()+dstEntity.relationships.size());
-            result=result*2;
+            result=result/(double)(this.relationships.size()*dstEntity.relationships.size());
             return(result);
         }
 
@@ -126,7 +125,7 @@ public class KnowledgeLib {//用数组存储实体，用链式结构来存储关
                     relationshipType=dstEntity.relationships.get(i).type;
                 }
             }
-            if(maxSimularity>0.01)WordKit.guessJudge=1/maxSimularity;
+            if(maxSimularity>0.01)WordKit.guessJudge=(1/maxSimularity)+3;
             else WordKit.guessJudge=300;
             return(relationshipType);
         }
@@ -203,9 +202,39 @@ public class KnowledgeLib {//用数组存储实体，用链式结构来存储关
 
     public RelationshipType guess(String wordL,String wordR){
         String wordLBuf=WordKit.stemming(wordL),wordRBuf=WordKit.stemming(wordR);
-        Entity entityL=search(wordLBuf),entityR=search(wordRBuf);
-        if(entityL==null||entityR==null)return(RelationshipType.OTHER);
 
+        //System.out.println("guessing "+wordLBuf+" and "+wordRBuf);
+
+        Entity entityL=search(wordLBuf),entityR=search(wordRBuf);
+        if(entityL==null||entityR==null){
+            WordKit.guessJudge=300;
+            return(RelationshipType.OTHER);
+        }
         return(entityL.gvtRelationshipGuess(entityR));
+    }
+
+    public RelationshipType guess(String sentence){
+        ArrayList<String> words=WordKit.pretreat(sentence);
+        RelationshipType typeBuf=null,result=null;
+        double minJudge=500;
+
+        for(int i=0;i<words.size()-1;i++){
+            for(int j=i+1;j<words.size();j++){
+                typeBuf=guess(words.get(i),words.get(j));
+                //System.out.println("Judge is "+WordKit.guessJudge);
+                if(WordKit.guessJudge<minJudge){
+
+                    //System.out.println("better guess !Judge is "+WordKit.guessJudge);
+
+                    result=typeBuf;
+                    minJudge=WordKit.guessJudge;
+                    WordKit.wordL=words.get(i);
+                    WordKit.wordR=words.get(j);
+                }
+            }
+        }
+
+        System.out.println("minJudge is "+minJudge);
+        return(result);
     }
 }
