@@ -202,7 +202,8 @@ public class KnowledgeLib {//用数组存储实体，用链式结构来存储关
     }
 
     public RelationshipType guess(String wordL,String wordR){
-        Entity entityL=search(wordL),entityR=search(wordR);
+        String wordLBuf=WordKit.stemming(wordL),wordRBuf=WordKit.stemming(wordR);
+        Entity entityL=search(wordLBuf),entityR=search(wordRBuf);
         if(entityL==null||entityR==null)return(RelationshipType.OTHER);
 
         return(entityL.gvtRelationshipGuess(entityR));
